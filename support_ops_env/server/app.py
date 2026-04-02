@@ -14,7 +14,12 @@ async def root() -> dict:
     return {
         "name": "support_ops_env",
         "status": "ok",
-        "routes": ["/health", "/metadata", "/schema", "/reset", "/step", "/state"],
+        "openenv_api": {
+            "reset": "POST /reset",
+            "step": "POST /step",
+            "state": "GET /state",
+        },
+        "routes": ["/", "/health", "/metadata", "/schema", "/reset", "/step", "/state", "/mcp"],
     }
 
 
