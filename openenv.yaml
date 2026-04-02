@@ -1,0 +1,8 @@
+name: support_ops_env
+version: 0.1.0
+description: Deterministic B2B support operations environment with triage and policy workflows.
+entrypoint: support_ops_env.server.app:app
+tasks:
+  - password_reset_triage
+  - billing_refund_policy
+  - account_compromise_signals
