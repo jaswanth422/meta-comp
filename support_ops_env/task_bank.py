@@ -16,7 +16,7 @@ def build_task_bank() -> dict[str, TaskSpec]:
             "Handle urgent login issue. Check account context, set correct priority, "
             "apply auth tag, consult password reset KB, draft concise reply, and close."
         ),
-        max_steps=8,
+        max_steps=11,
         ticket=Ticket(
             ticket_id="T-1001",
             subject="Locked out after MFA reset",

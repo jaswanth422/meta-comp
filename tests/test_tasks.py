@@ -9,6 +9,6 @@ def test_task_bank_has_three_tasks() -> None:
 
 def test_task_step_budgets() -> None:
     tasks = build_task_bank()
-    assert tasks["password_reset_triage"].max_steps == 8
+    assert tasks["password_reset_triage"].max_steps == 11
     assert tasks["billing_refund_policy"].max_steps == 10
     assert tasks["account_compromise_signals"].max_steps == 12

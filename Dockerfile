@@ -5,6 +5,7 @@ WORKDIR /app
 
 COPY pyproject.toml README.md ./
 COPY support_ops_env ./support_ops_env
+COPY server ./server
 COPY inference.py ./inference.py
 COPY openenv.yaml ./openenv.yaml
 

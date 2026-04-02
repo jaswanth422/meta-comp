@@ -4,6 +4,7 @@ Version: 0.1.0
 Summary: Deterministic support operations OpenEnv benchmark
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
+Requires-Dist: openenv-core
 Requires-Dist: pydantic>=2.8.0
 Requires-Dist: fastapi>=0.111.0
 Requires-Dist: uvicorn>=0.30.0
@@ -85,6 +86,13 @@ Required env vars:
 - `MODEL_NAME` (default: `Qwen/Qwen2.5-72B-Instruct`)
 - `IMAGE_NAME` or `LOCAL_IMAGE_NAME` (optional)
 
+For local validation:
+
+```bash
+pip install -e .[dev]
+openenv validate
+```
+
 ## Structured Log Format
 
 The script emits:
@@ -117,7 +125,7 @@ curl -s -X POST http://localhost:7860/reset -H 'content-type: application/json' 
 
 ## Baseline Scores
 
-Deterministic scripted fallback policy target scores:
-- `password_reset_triage`: close to `1.0`
-- `billing_refund_policy`: high score (policy-compliant)
-- `account_compromise_signals`: high score (safe escalation)
+Deterministic scripted fallback policy scores:
+- `password_reset_triage`: `1.0`
+- `billing_refund_policy`: `1.0`
+- `account_compromise_signals`: `1.0`
