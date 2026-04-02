@@ -1,3 +1,13 @@
+---
+title: meta-comp
+emoji: 📈
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # support_ops_env
 
 A deterministic OpenEnv-style environment that simulates B2B SaaS support operations workflows.
@@ -71,6 +81,13 @@ Required env vars:
 - `MODEL_NAME` (default: `Qwen/Qwen2.5-72B-Instruct`)
 - `IMAGE_NAME` or `LOCAL_IMAGE_NAME` (optional)
 
+For local validation:
+
+```bash
+pip install -e .[dev]
+openenv validate
+```
+
 ## Structured Log Format
 
 The script emits:
@@ -103,7 +120,13 @@ curl -s -X POST http://localhost:7860/reset -H 'content-type: application/json' 
 
 ## Baseline Scores
 
-Deterministic scripted fallback policy target scores:
-- `password_reset_triage`: close to `1.0`
-- `billing_refund_policy`: high score (policy-compliant)
-- `account_compromise_signals`: high score (safe escalation)
+Deterministic scripted fallback policy scores:
+- `password_reset_triage`: `1.0` (11 steps)
+- `billing_refund_policy`: `1.0` (10 steps)
+- `account_compromise_signals`: `1.0` (12 steps)
+
+Observed baseline run metrics (`python inference.py`):
+- Total tasks: `3`
+- Mean score: `1.000`
+- Success rate (`score >= 0.7`): `100%` (`3/3`)
+- Mean steps per task: `11.0`
