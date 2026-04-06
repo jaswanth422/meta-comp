@@ -1,99 +1,68 @@
-Build a complete, real-world OpenEnv environment that an AI agent can learn from through the standard  step() / reset() / state()  API.
+# Round 1 — Problem Statement
 
-Key Requirements at a Glance
+*The Task*
 
-Must simulate a real-world task (not games or toys)
+* Build a complete, real-world OpenEnv environment that an AI agent can learn from through the standard  step() / reset() / state()  API.
 
-Implement full OpenEnv spec: typed models, step()/reset()/state(), openenv.yaml
+# Key Requirements at a Glance
 
-Minimum 3 tasks with agent graders (easy → medium → hard, scores 0.0–1.0)
+* Must simulate a real-world task (not games or toys)
+* Implement full OpenEnv spec: typed models, step()/reset()/state(), openenv.yaml
+* Minimum 3 tasks with agent graders (easy → medium → hard, scores 0.0–1.0)
+* Meaningful reward function with partial progress signals
+* Baseline inference script with reproducible scores
+* Deploy to Hugging Face Spaces + working Dockerfile
+* README with environment description, action/observation spaces, setup instructions
 
-Meaningful reward function with partial progress signals
+# Functional Requirements
 
-Baseline inference script with reproducible scores
-
-Deploy to Hugging Face Spaces + working Dockerfile
-
-README with environment description, action/observation spaces, setup instructions
-
-
-Functional Requirements
-
-Real-world task simulation
+*Real-world task simulation*
 
 The environment must simulate a task humans actually do. Not games, not toys. Examples: email triage, code review, data cleaning, scheduling, customer support, content moderation.
 
-OpenEnv spec compliance
+*OpenEnv spec compliance*
 
 Implement the full OpenEnv interface: typed Observation, Action, and Reward Pydantic models. step(action) → returns observation, reward, done, info. reset() → returns initial observation. state() → returns current state. openenv.yaml with metadata. Tested via openenv validate.
 
-Minimum 3 tasks with agent graders
+*Minimum 3 tasks with agent graders*
 
 Each task defines a concrete objective an agent must accomplish, with a programmatic grader that scores performance (0.0–1.0). Tasks should range: easy → medium → hard. Graders must have clear, deterministic success/failure criteria.
 
-Meaningful reward function
+*Meaningful reward function*
 
 Provides signal over the full trajectory (not just binary end-of-episode). Rewards partial progress toward task completion. Penalizes clearly undesirable behavior (e.g. infinite loops, destructive actions).
 
-Baseline inference script
+*Baseline inference script*
 
-Uses the OpenAI API client to run a model against the environment. Reads API credentials from environment variables (OPENAI_API_KEY). Produces a reproducible baseline score on all 3 tasks.
+Uses the HF to run a model against the environment. Produces a reproducible baseline score on all 3 tasks.
 
+# Non-Functional Requirements
 
-Non-Functional Requirements
-
-Deploys to a Hugging Face Space
+*Deploys to a Hugging Face Space*
 
 Environment must run as a containerized HF Space tagged with openenv.
 
-Containerized execution
+*Containerized execution*
 
 Must include a working Dockerfile. The environment should start cleanly with docker build + docker run.
 
-Documentation
+*Documentation*
 
 README must include: environment description and motivation, action and observation space definitions, task descriptions with expected difficulty, setup and usage instructions, baseline scores.
 
+# Evaluation Criteria
 
-Parameter
+| Parameter                      | Weight | Description                                                                                                                        |
+| ------------------------------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Real-world utility             | 30%    | Does the environment model a genuine task? Would someone actually use this to train or evaluate agents?                            |
+| Task & grader quality          | 25%    | Are tasks well-defined with clear objectives? Do graders accurately and fairly measure success? Meaningful difficulty progression? |
+| Environment design             | 20%    | Clean state management, sensible action/observation spaces, good reward shaping, proper episode boundaries.                        |
+| Code quality & spec compliance | 15%    | Follows OpenEnv spec, clean project structure, typed models, documented, tested, Dockerfile works.                                 |
+| Creativity & novelty           | 10%    | Novel problem domain, interesting mechanics, clever reward design, original approach.                                              |
 
-Weight
+# Scoring Breakdown
 
-Description
-
-Real-world utility
-
-30%
-
-Does the environment model a genuine task? Would someone actually use this to train or evaluate agents?
-
-Task & grader quality
-
-25%
-
-Are tasks well-defined with clear objectives? Do graders accurately and fairly measure success? Meaningful difficulty progression?
-
-Environment design
-
-20%
-
-Clean state management, sensible action/observation spaces, good reward shaping, proper episode boundaries.
-
-Code quality & spec compliance
-
-15%
-
-Follows OpenEnv spec, clean project structure, typed models, documented, tested, Dockerfile works.
-
-Creativity & novelty
-
-10%
-
-Novel problem domain, interesting mechanics, clever reward design, original approach.
-
-Scoring Breakdown
-
-Real-world utility (30%)
+*Real-world utility (30%)*
 
 •  0–5: Toy/artificial problem with no practical application
 
@@ -103,7 +72,7 @@ Real-world utility (30%)
 
 •  26–30: Excellent — fills a real gap, immediate value for the RL/agent community
 
-Task & grader quality (25%)
+*Task & grader quality (25%)*
 
 •  3+ tasks with difficulty range?
 
@@ -113,7 +82,7 @@ Task & grader quality (25%)
 
 •  Hard task genuinely challenges frontier models?
 
-Environment design (20%)
+*Environment design (20%)*
 
 •  reset() produces clean state?
 
@@ -123,7 +92,7 @@ Environment design (20%)
 
 •  Episode boundaries sensible?
 
-Code quality & spec compliance (15%)
+*Code quality & spec compliance (15%)*
 
 •  openenv validate passes?
 
@@ -133,7 +102,7 @@ Code quality & spec compliance (15%)
 
 •  Baseline script runs and reproduces scores?
 
-Creativity & novelty (10%)
+*Creativity & novelty (10%)*
 
 •  Domain we haven’t seen in OpenEnv before?
 
@@ -141,121 +110,123 @@ Creativity & novelty (10%)
 
 •  Clever mechanics that make the environment engaging?
 
+# How Judging works
 
-Phase 1: Automated Validation
+*Phase 1: Automated Validation*
 
 Pass/fail gate — HF Space deploys, OpenEnv spec compliance, Dockerfile builds, baseline reproduces, 3+ tasks with graders.
 
-Phase 2: Agentic Evaluation
+*Phase 2: Agentic Evaluation*
 
 Scored — baseline agent re-run, standard Open LLM agent (e.g. Nemotron 3 Super) run against all environments, score variance check.
 
-Phase 3: Human Review
+*Phase 3: Human Review*
 
 Top submissions reviewed by Meta and Hugging Face engineers for real-world utility, creativity, and exploit checks.
 
-Disqualification Criteria
+*Disqualification Criteria*
 
-Environment does not deploy or respond
+* Environment does not deploy or respond
+* Plagiarized or trivially modified existing environments
+* Graders that always return the same score
+* No baseline inference script
 
-Plagiarized or trivially modified existing environments
+# Pre-Submission Checklist  — all must pass or you're disqualified
 
-Graders that always return the same score
-
-No baseline inference script
-
-
-Pre-Submission Checklist  — all must pass or you're disqualified
-
-HF Space deploys
+*HF Space deploys*
 
 Automated ping to the Space URL — must return 200 and respond to reset()
 
-OpenEnv spec compliance
+*OpenEnv spec compliance*
 
 Validate openenv.yaml, typed models, step()/reset()/state() endpoints
 
-Dockerfile builds
+*Dockerfile builds*
 
 Automated docker build on the submitted repo
 
-Baseline reproduces
+*Baseline reproduces*
 
 Run the submitted inference script — must complete without error and produce scores
 
-3+ tasks with graders
+*3+ tasks with graders*
 
-Enumerate tasks, run each grader, verify scores in 0.0–1.0 range
+Enumerate tasks, run each grader, verify scores/reward in 0.0–1.0 range
 
-Mandatory Additional Instructions
+*Mandatory Additional Instructions*
 
-Before submitting, ensure the following variables are defined in your environment configuration:
+- Before submitting, ensure the following variables are defined in your environment configuration:
 
-API_BASE_URL   The API endpoint for the LLM.
+- API_BASE_URL   The API endpoint for the LLM.
 
-MODEL_NAME     The model identifier to use for inference.
+- MODEL_NAME     The model identifier to use for inference.
 
-HF_TOKEN       Your Hugging Face / API key.
+- HF_TOKEN       Your Hugging Face / API key.
 
-The inference script must be named `inference.py` and placed in the root directory of the project
+- The inference script must be named `inference.py` and placed in the root directory of the project
 
-Participants must use OpenAI Client for all LLM calls using above variables
+- Participants can use HF tokens for all LLM calls using above variables
 
-Participants must emit structured stdout logs strictly following the [START], [STEP], and [END] format defined in the sample inference.py provided below. Any deviation in field names, ordering, or formatting will result in incorrect evaluation scoring. Refer to the Sample Inference Script for the complete format specification and examples.
+- Participants must emit structured stdout logs strictly following the [START], [STEP], and [END] format defined in the sample inference.py provided below. Any deviation in field names, ordering, or formatting will result in incorrect evaluation scoring. Refer to the Sample Inference Script for the complete format specification and examples.
 
-Infra Restrictions
+*Infra Restrictions*
 
-Runtime of inference script should be less than 20min 
+- Runtime of inference script should be less than 20min 
 
-Make sure your env and inference can run on a machine with vcpu=2, memory=8gb
+- Make sure your env and inference can run on a machine with vcpu=2, memory=8gb
 
-Validator
+
+*Validator*
 
 Run the pre-submission validation script before submitting
 
+# Sample inference script
 
 """
 Inference Script Example
-===================================
-MANDATORY
-- Before submitting, ensure the following variables are defined in your environment configuration:
-    API_BASE_URL   The API endpoint for the LLM.
-    MODEL_NAME     The model identifier to use for inference.
-    HF_TOKEN       Your Hugging Face / API key.
-    LOCAL_IMAGE_NAME The name of the local image to use for the environment if you are using from_docker_image()
-                     method
+========================
 
-- Defaults are set only for API_BASE_URL and MODEL_NAME 
-    (and should reflect your active inference setup):
-    API_BASE_URL = os.getenv("API_BASE_URL", "<your-active-endpoint>")
-    MODEL_NAME = os.getenv("MODEL_NAME", "<your-active-model>")
-    
+MANDATORY
+
+- Before submitting, ensure the following variables are defined in your environment configuration:
+  API_BASE_URL   The API endpoint for the LLM.
+  MODEL_NAME     The model identifier to use for inference.
+  HF_TOKEN       Your Hugging Face / API key.
+  LOCAL_IMAGE_NAME The name of the local image to use for the environment if you are using from_docker_image()
+  method
+- Defaults are set only for API_BASE_URL and MODEL_NAME
+  (and should reflect your active inference setup):
+  API_BASE_URL = os.getenv("API_BASE_URL", "`<your-active-endpoint>`")
+  MODEL_NAME = os.getenv("MODEL_NAME", "`<your-active-model>`")
 - The inference script must be named `inference.py` and placed in the root directory of the project
 - Participants must use OpenAI Client for all LLM calls using above variables
 
 STDOUT FORMAT
+
 - The script must emit exactly three line types to stdout, in this order:
 
-    [START] task=<task_name> env=<benchmark> model=<model_name>
-    [STEP]  step=<n> action=<action_str> reward=<0.00> done=<true|false> error=<msg|null>
-    [END]   success=<true|false> steps=<n> rewards=<r1,r2,...,rn>
+  [START] task=<task_name> env=`<benchmark>` model=<model_name>
+  [STEP]  step=`<n>` action=<action_str> reward=<0.00> done=<true|false> error=<msg|null>
+  [END]   success=<true|false> steps=`<n>` score=`<score>` rewards=<r1,r2,...,rn>
 
   Rules:
-    - One [START] line at episode begin.
-    - One [STEP] line per step, immediately after env.step() returns.
-    - One [END] line after env.close(), always emitted (even on exception).
-    - reward and rewards are formatted to 2 decimal places.
-    - done and success are lowercase booleans: true or false.
-    - error is the raw last_action_error string, or null if none.
-    - All fields on a single line with no newlines within a line.
+
+  - One [START] line at episode begin.
+  - One [STEP] line per step, immediately after env.step() returns.
+  - One [END] line after env.close(), always emitted (even on exception).
+  - reward and rewards are formatted to 2 decimal places.
+  - done and success are lowercase booleans: true or false.
+  - error is the raw last_action_error string, or null if none.
+  - All fields on a single line with no newlines within a line.
+  - Each tasks should return score in [0, 1]
 
   Example:
-    [START] task=click-test env=miniwob model=Qwen3-VL-30B
-    [STEP] step=1 action=click('123') reward=0.00 done=false error=null
-    [STEP] step=2 action=fill('456','text') reward=0.00 done=false error=null
-    [STEP] step=3 action=click('789') reward=1.00 done=true error=null
-    [END] success=true steps=3 rewards=0.00,0.00,1.00
-"""
+  [START] task=click-test env=miniwob model=Qwen3-VL-30B
+  [STEP] step=1 action=click('123') reward=0.00 done=false error=null
+  [STEP] step=2 action=fill('456','text') reward=0.00 done=false error=null
+  [STEP] step=3 action=click('789') reward=1.00 done=true error=null
+  [END] success=true steps=3 score=1.00 rewards=0.00,0.00,1.00
+  """
 
 import asyncio
 import os
@@ -265,7 +236,7 @@ from typing import List, Optional
 from openai import OpenAI
 
 from my_env_v4 import MyEnvV4Action, MyEnvV4Env
-IMAGE_NAME = os.getenv("IMAGE_NAME") # If you are using docker image 
+IMAGE_NAME = os.getenv("IMAGE_NAME") # If you are using docker image
 API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
 
 API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
@@ -278,6 +249,7 @@ MAX_TOKENS = 150
 SUCCESS_SCORE_THRESHOLD = 0.1  # normalized score in [0, 1]
 
 # Max possible reward: each token contributes 0.1, across all steps
+
 _MAX_REWARD_PER_STEP = MAX_TOKENS * 0.1
 MAX_TOTAL_REWARD = MAX_STEPS * _MAX_REWARD_PER_STEP
 
@@ -291,10 +263,8 @@ SYSTEM_PROMPT = textwrap.dedent(
     """
 ).strip()
 
-
 def log_start(task: str, env: str, model: str) -> None:
     print(f"[START] task={task} env={env} model={model}", flush=True)
-
 
 def log_step(step: int, action: str, reward: float, done: bool, error: Optional[str]) -> None:
     error_val = error if error else "null"
@@ -304,11 +274,9 @@ def log_step(step: int, action: str, reward: float, done: bool, error: Optional[
         flush=True,
     )
 
-
 def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> None:
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
     print(f"[END] success={str(success).lower()} steps={steps} score={score:.3f} rewards={rewards_str}", flush=True)
-
 
 def build_user_prompt(step: int, last_echoed: str, last_reward: float, history: List[str]) -> str:
     history_block = "\n".join(history[-4:]) if history else "None"
@@ -322,7 +290,6 @@ def build_user_prompt(step: int, last_echoed: str, last_reward: float, history: 
         Send your next message.
         """
     ).strip()
-
 
 def get_model_message(client: OpenAI, step: int, last_echoed: str, last_reward: float, history: List[str]) -> str:
     user_prompt = build_user_prompt(step, last_echoed, last_reward, history)
@@ -343,7 +310,6 @@ def get_model_message(client: OpenAI, step: int, last_echoed: str, last_reward: 
         print(f"[DEBUG] Model request failed: {exc}", flush=True)
         return "hello"
 
-
 async def main() -> None:
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
@@ -362,32 +328,32 @@ async def main() -> None:
         last_echoed = result.observation.echoed_message
         last_reward = 0.0
 
-        for step in range(1, MAX_STEPS + 1):
+    for step in range(1, MAX_STEPS + 1):
             if result.done:
                 break
 
-            message = get_model_message(client, step, last_echoed, last_reward, history)
+    message = get_model_message(client, step, last_echoed, last_reward, history)
 
-            result = await env.step(MyEnvV4Action(message=message))
+    result = await env.step(MyEnvV4Action(message=message))
             obs = result.observation
 
-            reward = result.reward or 0.0
+    reward = result.reward or 0.0
             done = result.done
             error = None
 
-            rewards.append(reward)
+    rewards.append(reward)
             steps_taken = step
             last_echoed = obs.echoed_message
             last_reward = reward
 
-            log_step(step=step, action=message, reward=reward, done=done, error=error)
+    log_step(step=step, action=message, reward=reward, done=done, error=error)
 
-            history.append(f"Step {step}: {message!r} -> reward {reward:+.2f}")
+    history.append(f"Step {step}: {message!r} -> reward {reward:+.2f}")
 
-            if done:
+    if done:
                 break
 
-        score = sum(rewards) / MAX_TOTAL_REWARD if MAX_TOTAL_REWARD > 0 else 0.0
+    score = sum(rewards) / MAX_TOTAL_REWARD if MAX_TOTAL_REWARD > 0 else 0.0
         score = min(max(score, 0.0), 1.0)  # clamp to [0, 1]
         success = score >= SUCCESS_SCORE_THRESHOLD
 
@@ -398,38 +364,48 @@ async def main() -> None:
             print(f"[DEBUG] env.close() error (container cleanup): {e}", flush=True)
         log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
 
-
 if __name__ == "__main__":
     asyncio.run(main())
 
+# Pre-validation script
 
+"""
 
 #!/usr/bin/env bash
-#
+
 # validate-submission.sh — OpenEnv Submission Validator
-#
+
 # Checks that your HF Space is live, Docker image builds, and openenv validate passes.
-#
+
 # Prerequisites:
-#   - Docker:       https://docs.docker.com/get-docker/
-#   - openenv-core: pip install openenv-core
-#   - curl (usually pre-installed)
-#
+
+# - Docker:       https://docs.docker.com/get-docker/
+
+# - openenv-core: pip install openenv-core
+
+# - curl (usually pre-installed)
+
 # Run:
-#   curl -fsSL https://raw.githubusercontent.com/<owner>/<repo>/main/scripts/validate-submission.sh | bash -s -- <ping_url> [repo_dir]
-#
-#   Or download and run locally:
-#     chmod +x validate-submission.sh
-#     ./validate-submission.sh <ping_url> [repo_dir]
-#
+
+# curl -fsSL https://raw.githubusercontent.com/`<owner>`/`<repo>`/main/scripts/validate-submission.sh | bash -s -- <ping_url> [repo_dir]
+
+# Or download and run locally:
+
+# chmod +x validate-submission.sh
+
+# ./validate-submission.sh <ping_url> [repo_dir]
+
 # Arguments:
-#   ping_url   Your HuggingFace Space URL (e.g. https://your-space.hf.space)
-#   repo_dir   Path to your repo (default: current directory)
-#
+
+# ping_url   Your HuggingFace Space URL (e.g. https://your-space.hf.space)
+
+# repo_dir   Path to your repo (default: current directory)
+
 # Examples:
-#   ./validate-submission.sh https://my-team.hf.space
-#   ./validate-submission.sh https://my-team.hf.space ./my-repo
-#
+
+# ./validate-submission.sh https://my-team.hf.space
+
+# ./validate-submission.sh https://my-team.hf.space ./my-repo
 
 set -uo pipefail
 
@@ -513,8 +489,8 @@ log "${BOLD}Step 1/3: Pinging HF Space${NC} ($PING_URL/reset) ..."
 
 CURL_OUTPUT=$(portable_mktemp "validate-curl")
 CLEANUP_FILES+=("$CURL_OUTPUT")
-HTTP_CODE=$(curl -s -o "$CURL_OUTPUT" -w "%{http_code}" -X POST \
-  -H "Content-Type: application/json" -d '{}' \
+HTTP_CODE=$(curl -s -o "$CURL_OUTPUT" -w "%{http_code}" -X POST 
+  -H "Content-Type: application/json" -d '{}' 
   "$PING_URL/reset" --max-time 30 2>"$CURL_OUTPUT" || printf "000")
 
 if [ "$HTTP_CODE" = "200" ]; then
@@ -588,4 +564,4 @@ printf "${GREEN}${BOLD}  Your submission is ready to submit.${NC}\n"
 printf "${BOLD}========================================${NC}\n"
 printf "\n"
 
-exit 0
+exit 0 """
