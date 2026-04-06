@@ -153,7 +153,7 @@ def _model_action(client: OpenAI, task_id: str, observation: dict, step: int) ->
 
 
 async def run_task(client: OpenAI, task_id: str) -> float:
-    env = await SupportOpsEnv.from_docker_image(IMAGE_NAME)
+    env: Optional[SupportOpsEnv] = None
     rewards: list[float] = []
     steps = 0
     success = False
@@ -162,6 +162,7 @@ async def run_task(client: OpenAI, task_id: str) -> float:
     log_start(task=task_id, env=BENCHMARK, model=MODEL_NAME)
 
     try:
+        env = await SupportOpsEnv.from_docker_image(IMAGE_NAME)
         result = await env.reset(task_id=task_id)
         while not result.done and steps < result.observation.max_steps:
             steps += 1
@@ -179,9 +180,14 @@ async def run_task(client: OpenAI, task_id: str) -> float:
 
         state = await env.state()
         score = state.score
+        score = min(max(score, 0.0), 1.0)
         success = score >= 0.7
     finally:
-        await env.close()
+        if env is not None:
+            try:
+                await env.close()
+            except Exception:
+                pass
         log_end(success=success, steps=steps, score=score, rewards=rewards)
 
     return score

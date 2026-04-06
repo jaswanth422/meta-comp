@@ -16,6 +16,8 @@ A deterministic OpenEnv-style environment that simulates B2B SaaS support operat
 
 This benchmark models real support operations work: queue triage, policy lookup, classification, escalation, and customer-safe communication.
 
+It is designed to evaluate whether an agent can complete realistic support workflows end-to-end while respecting policy and safety constraints.
+
 ## Action Space
 
 Typed action model: `SupportOpsAction` with `action_type` and structured optional fields.
@@ -49,10 +51,36 @@ Supported actions:
 ## Tasks
 
 1. `password_reset_triage` (easy)
+	 Objective: Triage a locked-account request, consult the password reset runbook, route correctly, and close with the proper resolution code.
+
 2. `billing_refund_policy` (medium)
+	 Objective: Apply prorated refund policy correctly, avoid over-promising, route to billing operations, and submit a compliant resolution.
+
 3. `account_compromise_signals` (hard)
+	 Objective: Handle conflicting compromise signals by prioritizing security, escalating correctly, adding internal notes, and avoiding unsafe closure.
 
 All graders are deterministic and return scores in `[0.0, 1.0]`.
+
+## Reward Design
+
+The reward function is dense and trajectory-aware.
+
+- Positive shaping:
+	- Opening a ticket.
+	- Reading required knowledge-base articles.
+	- Setting required priority.
+	- Adding required tags.
+	- Assigning/escalating to correct teams.
+	- Drafting policy-compliant replies with required phrases.
+- Negative shaping:
+	- Invalid actions.
+	- Unsafe response content.
+	- Premature closure in security incidents.
+	- Max-step timeout pressure.
+- Episode-end bonus:
+	- Final task grade bonus proportional to normalized grader score.
+
+This creates partial progress signals throughout an episode rather than only sparse terminal reward.
 
 ## Setup
 
@@ -97,6 +125,12 @@ The script emits:
 
 Note: This implementation includes `score=<...>` in `[END]` to align with the provided sample code behavior.
 
+Formatting guarantees:
+- Exactly one `[START]` at episode begin.
+- Exactly one `[STEP]` for each successful `env.step(...)` call.
+- Exactly one `[END]` per task run, even when runtime failures occur.
+- Reward fields are printed with fixed decimal precision.
+
 ## Docker
 
 ```bash
@@ -109,6 +143,20 @@ Then verify:
 ```bash
 curl -s http://localhost:7860/health
 curl -s -X POST http://localhost:7860/reset -H 'content-type: application/json' -d '{}'
+```
+
+## OpenEnv Validation
+
+Run local validator checks before submission:
+
+```bash
+/Users/katurijaswanth/Desktop/meta-comp/.venv/bin/openenv validate
+```
+
+Or, if your virtual environment is activated:
+
+```bash
+openenv validate
 ```
 
 ## Hugging Face Space Deployment
@@ -130,3 +178,16 @@ Observed baseline run metrics (`python inference.py`):
 - Mean score: `1.000`
 - Success rate (`score >= 0.7`): `100%` (`3/3`)
 - Mean steps per task: `11.0`
+
+## Pre-Submission Validator Script
+
+Use the repository-provided validator for pre-submission checks:
+
+```bash
+bash scripts/validate-submission.sh <your_space_url>
+```
+
+This validates:
+- Hugging Face Space responds to `/reset`.
+- Docker build succeeds.
+- `openenv validate` passes.
