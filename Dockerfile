@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM public.ecr.aws/docker/library/python:3.11-slim
 
 ENV PYTHONUNBUFFERED=1
 ENV PIP_NO_CACHE_DIR=1
