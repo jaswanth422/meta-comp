@@ -15,6 +15,11 @@ MODEL_NAME = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
 BENCHMARK = "support_ops_env"
 TEMPERATURE = 0.0
 MAX_TOKENS = 250
+EPSILON = 1e-6
+
+
+def clamp_score(value: float) -> float:
+    return min(max(value, EPSILON), 1.0 - EPSILON)
 
 
 def log_start(task: str, env: str, model: str) -> None:
@@ -179,8 +184,7 @@ async def run_task(client: OpenAI, task_id: str) -> float:
             )
 
         state = await env.state()
-        score = state.score
-        score = min(max(score, 0.0), 1.0)
+        score = clamp_score(state.score)
         success = score >= 0.7
     finally:
         if env is not None:
@@ -190,7 +194,7 @@ async def run_task(client: OpenAI, task_id: str) -> float:
                 pass
         log_end(success=success, steps=steps, score=score, rewards=rewards)
 
-    return score
+    return clamp_score(score)
 
 
 async def main() -> None:

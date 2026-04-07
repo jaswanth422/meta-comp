@@ -5,8 +5,12 @@ from typing import Callable
 from support_ops_env.models import SupportOpsState, TaskSpec
 
 
+EPSILON = 1e-6
+
+
 def clamp_score(value: float) -> float:
-    return min(max(value, 0.0), 1.0)
+    # Competition validator requires scores to be strictly within (0, 1).
+    return min(max(value, EPSILON), 1.0 - EPSILON)
 
 
 def _contains_all(text: str, required: list[str]) -> bool:
@@ -24,7 +28,7 @@ def grade_task_common(state: SupportOpsState, task: TaskSpec) -> float:
     expected = task.expected
     ticket = state.active_ticket
     if ticket is None:
-        return 0.0
+        return clamp_score(0.0)
 
     if ticket.priority == expected.required_priority and expected.required_priority:
         score += 0.20
@@ -62,7 +66,7 @@ def grade_password_reset_triage(state: SupportOpsState, task: TaskSpec) -> float
     expected = task.expected
     ticket = state.active_ticket
     if not ticket:
-        return 0.0
+        return clamp_score(0.0)
     if expected.must_close and ticket.status != "closed":
         score -= 0.20
     if state.submitted_resolution_code != expected.required_resolution_code:
@@ -88,7 +92,7 @@ def grade_account_compromise_signals(state: SupportOpsState, task: TaskSpec) -> 
     expected = task.expected
     ticket = state.active_ticket
     if not ticket:
-        return 0.0
+        return clamp_score(0.0)
     if ticket.status == "closed":
         score -= 0.35
     if not expected.required_kb_article_ids.issubset(state.visited_articles):
