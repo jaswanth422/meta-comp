@@ -15,7 +15,8 @@ MODEL_NAME = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
 BENCHMARK = "support_ops_env"
 TEMPERATURE = 0.0
 MAX_TOKENS = 250
-EPSILON = 1e-6
+# Score is logged to 3 decimals; use an epsilon that survives rounding.
+EPSILON = 1e-3
 
 
 def clamp_score(value: float) -> float:
@@ -35,6 +36,7 @@ def log_step(step: int, action: str, reward: float, done: bool, error: Optional[
 
 
 def log_end(success: bool, steps: int, score: float, rewards: list[float]) -> None:
+    score = clamp_score(score)
     rewards_str = ",".join(f"{r:.2f}" for r in rewards)
     print(
         f"[END] success={str(success).lower()} steps={steps} score={score:.3f} rewards={rewards_str}",
