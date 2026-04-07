@@ -5,13 +5,9 @@ from typing import Callable
 from support_ops_env.models import SupportOpsState, TaskSpec
 
 
-# Keep enough margin so downstream 3-decimal formatting cannot round to 0.000 or 1.000.
-EPSILON = 1e-3
-
-
 def clamp_score(value: float) -> float:
     # Competition validator requires scores to be strictly within (0, 1).
-    return min(max(value, EPSILON), 1.0 - EPSILON)
+    return max(0.001, min(value, 0.999))
 
 
 def _contains_all(text: str, required: list[str]) -> bool:

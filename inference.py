@@ -15,12 +15,10 @@ MODEL_NAME = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
 BENCHMARK = "support_ops_env"
 TEMPERATURE = 0.0
 MAX_TOKENS = 250
-# Score is logged to 3 decimals; use an epsilon that survives rounding.
-EPSILON = 1e-3
 
 
 def clamp_score(value: float) -> float:
-    return min(max(value, EPSILON), 1.0 - EPSILON)
+    return max(0.001, min(value, 0.999))
 
 
 def log_start(task: str, env: str, model: str) -> None:
