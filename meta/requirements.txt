@@ -1,0 +1,10 @@
+# Runtime dependencies
+openenv-core==0.2.3
+pydantic==2.12.5
+fastapi==0.135.3
+uvicorn==0.42.0
+openai==2.30.0
+
+# Dev/test dependencies
+pytest==8.4.2
+pytest-asyncio==1.2.0
