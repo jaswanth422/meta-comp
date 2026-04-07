@@ -175,7 +175,7 @@ class SupportOpsState(BaseModel):
     achieved_milestones: Set[str] = Field(default_factory=set)
     last_action_status: str = "ok"
     last_action_error: Optional[str] = None
-    score: float = 0.0
+    score: float = 1e-3
 
 
 class StepResult(BaseModel):

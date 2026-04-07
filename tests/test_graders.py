@@ -1,6 +1,6 @@
 import pytest
 
-from support_ops_env.graders import grade_task
+from support_ops_env.graders import clamp_score, grade_task
 from support_ops_env.models import ActionType, SupportOpsAction
 from support_ops_env.server.support_ops_environment import SupportOpsEnv
 
@@ -48,3 +48,20 @@ async def test_wrong_flow_scores_low() -> None:
     task = env.task_bank["account_compromise_signals"]
     score = grade_task(state, task)
     assert 0.0 <= score <= 0.4
+
+
+def test_clamp_score_is_strict_open_interval() -> None:
+    assert clamp_score(0.0) > 0.0
+    assert clamp_score(1.0) < 1.0
+
+
+@pytest.mark.asyncio
+async def test_state_score_is_strictly_bounded_during_episode() -> None:
+    env = SupportOpsEnv(task_id="password_reset_triage")
+    await env.reset()
+
+    state = await env.state()
+    assert 0.0 < state.score < 1.0
+
+    step = await env.step(SupportOpsAction(action_type=ActionType.VIEW_QUEUE))
+    assert 0.0 < float(step.info["score"]) < 1.0

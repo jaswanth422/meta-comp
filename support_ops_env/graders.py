@@ -5,7 +5,8 @@ from typing import Callable
 from support_ops_env.models import SupportOpsState, TaskSpec
 
 
-EPSILON = 1e-6
+# Keep enough margin so downstream 3-decimal formatting cannot round to 0.000 or 1.000.
+EPSILON = 1e-3
 
 
 def clamp_score(value: float) -> float:

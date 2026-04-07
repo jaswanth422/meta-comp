@@ -4,7 +4,7 @@ import uuid
 from copy import deepcopy
 from typing import Any, Optional
 
-from support_ops_env.graders import grade_task
+from support_ops_env.graders import clamp_score, grade_task
 from support_ops_env.models import (
     ActionHistoryEntry,
     ActionType,
@@ -75,7 +75,7 @@ class SupportOpsEnv:
 
         if self._state.done:
             obs = self._build_observation()
-            return StepResult(observation=obs, reward=0.0, done=True, info={"score": self._state.score})
+            return StepResult(observation=obs, reward=0.0, done=True, info={"score": clamp_score(self._state.score)})
 
         self._state.step_count += 1
         self._state.last_action_status = "ok"
@@ -91,7 +91,7 @@ class SupportOpsEnv:
         done = self._is_done(action)
         if done:
             self._state.done = True
-            final_score = grade_task(self._state, self._task)
+            final_score = clamp_score(grade_task(self._state, self._task))
             self._state.score = final_score
             reward += 0.30 * final_score
             self._state.reward_breakdown["final_score_bonus"] = 0.30 * final_score
@@ -106,7 +106,7 @@ class SupportOpsEnv:
 
         obs = self._build_observation()
         info: dict[str, Any] = {
-            "score": self._state.score,
+            "score": clamp_score(self._state.score),
             "error": self._state.last_action_error,
             "task_id": self._state.task_id,
         }
